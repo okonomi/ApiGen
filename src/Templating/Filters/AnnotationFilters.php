@@ -48,8 +48,7 @@ class AnnotationFilters extends Filters
 		'usedby' => 9,
 		'internal' => 10,
 		'example' => 11,
-		'tutorial' => 12,
-		'todo' => 13
+		'todo' => 12
 	];
 
 	/**
