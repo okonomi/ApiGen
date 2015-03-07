@@ -127,7 +127,6 @@ class UrlFilters extends Filters
 			'return' => $this->processReturnAnnotations($value, $reflectionElement),
 			'throws' => $this->processThrowsAnnotations($value, $reflectionElement),
 			'license' => $this->processLicenseAnnotations($value),
-			'link' => $this->processLinkAnnotations($value),
 			'see' => $this->processSeeAnnotations($value, $reflectionElement),
 			'uses' => $this->processUsesAndUsedbyAnnotations($value, $reflectionElement),
 			'usedby' => $this->processUsesAndUsedbyAnnotations($value, $reflectionElement),
@@ -231,7 +230,7 @@ class UrlFilters extends Filters
 			$text = $this->markup->line($text);
 		}
 
-		return $this->resolveLinkAndSeeAnnotation($text, $reflectionElement);
+		return $this->resolveSeeAnnotation($text, $reflectionElement);
 	}
 
 
@@ -261,9 +260,9 @@ class UrlFilters extends Filters
 	 * @param ReflectionElement $reflectionElement
 	 * @return string
 	 */
-	private function resolveLinkAndSeeAnnotation($text, ReflectionElement $reflectionElement)
+	private function resolveSeeAnnotation($text, ReflectionElement $reflectionElement)
 	{
-		return preg_replace_callback('~{@(?:link|see)\\s+([^}]+)}~', function ($matches) use ($reflectionElement) {
+		return preg_replace_callback('~{@(?:see)\\s+([^}]+)}~', function ($matches) use ($reflectionElement) {
 			list($url, $description) = Strings::split($matches[1]);
 
 			if (Validators::isUri($url)) {

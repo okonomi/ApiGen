@@ -72,7 +72,6 @@ class UrlFiltersTest extends PHPUnit_Framework_TestCase
 	public function getInternalData()
 	{
 		return [
-			['{@internal Inside {@link some comment}, foo}', 'Inside {@link some comment}, foo'],
 			['{@internal}', ''],
 			['{@inherited bar}', '{@inherited bar}'],
 		];
@@ -80,14 +79,14 @@ class UrlFiltersTest extends PHPUnit_Framework_TestCase
 
 
 	/**
-	 * @dataProvider getLinkAndSeeData()
+	 * @dataProvider getSeeData()
 	 */
-	public function testResolveLinkAndSeeAnnotation($docBlock, $expectedLink)
+	public function testResolveSeeAnnotation($docBlock, $expectedLink)
 	{
 		$reflectionElementMock = Mockery::mock('ApiGen\Reflection\ReflectionElement');
 		$this->assertSame(
 			$expectedLink,
-			MethodInvoker::callMethodOnObject($this->urlFilters, 'resolveLinkAndSeeAnnotation', [
+			MethodInvoker::callMethodOnObject($this->urlFilters, 'resolveSeeAnnotation', [
 				$docBlock, $reflectionElementMock
 			])
 		);
@@ -97,17 +96,12 @@ class UrlFiltersTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @return array[]
 	 */
-	public function getLinkAndSeeData()
+	public function getSeeData()
 	{
 		return [
-			['{@link http://apigen.org Description}', '<a href="http://apigen.org">Description</a>'],
-			['{@link http://apigen.org}', '<a href="http://apigen.org">http://apigen.org</a>'],
 			['{@see http://php.net/manual/en PHP Manual}', '<a href="http://php.net/manual/en">PHP Manual</a>'],
 			['{@see NotActiveClass}', 'NotActiveClass'],
-			[
-				'{@see ApiGen\ApiGen}',
-				self::APIGEN_LINK
-			]
+			['{@see ApiGen\ApiGen}', self::APIGEN_LINK]
 		];
 	}
 
@@ -262,8 +256,6 @@ EXPECTED;
 			['ApiGen\ApiGen', 'throws', self::APIGEN_LINK],
 			['...', 'return', '...'],
 			['http://licence.com MIT', 'license', '<a href="http://licence.com">MIT</a>'],
-			['http://licence.com MIT', 'link', '<a href="http://licence.com">MIT</a>'],
-			['ApiGen\ApiGen', 'link', 'Markupped line: ApiGen\ApiGen'],
 			['ApiGen\ApiGen', 'see', self::APIGEN_LINK],
 			['ApiGen\ApiGen', 'uses', self::APIGEN_LINK],
 			['ApiGen\ApiGen', 'usedby', self::APIGEN_LINK]

@@ -37,8 +37,7 @@ class AnnotationFilters extends Filters
 	 * @var array
 	 */
 	private $order = [
-		'deprecated' => 0,
-		'category' => 1,
+		'deprecated' => 1,
 		'copyright' => 2,
 		'license' => 3,
 		'author' => 4,
@@ -47,11 +46,10 @@ class AnnotationFilters extends Filters
 		'see' => 7,
 		'uses' => 8,
 		'usedby' => 9,
-		'link' => 10,
-		'internal' => 11,
-		'example' => 12,
-		'tutorial' => 13,
-		'todo' => 14
+		'internal' => 10,
+		'example' => 11,
+		'tutorial' => 12,
+		'todo' => 13
 	];
 
 	/**
