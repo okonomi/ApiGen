@@ -10,14 +10,12 @@
 namespace ApiGen\Configuration\Theme;
 
 use ApiGen\Configuration\Exceptions\ConfigurationException;
-use ApiGen\Configuration\OptionsResolverFactory;
 use ApiGen\Configuration\Theme\ThemeConfigOptions as TCO;
-use Nette;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
-class ThemeConfigOptionsResolver extends Nette\Object
+class ThemeConfigOptionsResolver
 {
 
 	/**
@@ -90,24 +88,13 @@ class ThemeConfigOptionsResolver extends Nette\Object
 	 */
 	private $resolver;
 
-	/**
-	 * @var OptionsResolverFactory
-	 */
-	private $optionsResolverFactory;
-
-
-	public function __construct(OptionsResolverFactory $optionsResolverFactory)
-	{
-		$this->optionsResolverFactory = $optionsResolverFactory;
-	}
-
 
 	/**
 	 * @return array
 	 */
 	public function resolve(array $options)
 	{
-		$this->resolver = $this->optionsResolverFactory->create();
+		$this->resolver = new OptionsResolver;
 		$this->setDefaults();
 		$this->setNormalizers();
 		return $this->resolver->resolve($options);
@@ -122,19 +109,18 @@ class ThemeConfigOptionsResolver extends Nette\Object
 
 	private function setNormalizers()
 	{
-		$this->resolver->setNormalizers([
-			TCO::RESOURCES => function (Options $options, $resources) {
-				$absolutizedResources = [];
-				foreach ($resources as $key => $resource) {
-					$key = $options['templatesPath'] . '/' . $key;
-					$absolutizedResources[$key] = $resource;
-				}
-				return $absolutizedResources;
-			},
-			TCO::TEMPLATES => function (Options $options, $value) {
-				return $this->makeTemplatePathsAbsolute($value, $options);
+		$this->resolver->setNormalizer(TCO::RESOURCES, function (Options $options, $resources) {
+			$absolutizedResources = [];
+			foreach ($resources as $key => $resource) {
+				$key = $options['templatesPath'] . '/' . $key;
+				$absolutizedResources[$key] = $resource;
 			}
-		]);
+			return $absolutizedResources;
+		});
+
+		$this->resolver->setNormalizer(TCO::TEMPLATES, function (Options $options, $value) {
+			return $this->makeTemplatePathsAbsolute($value, $options);
+		});
 	}
 
 
@@ -159,7 +145,9 @@ class ThemeConfigOptionsResolver extends Nette\Object
 	private function validateFileExistence($file, $type)
 	{
 		if ( ! is_file($file)) {
-			throw new ConfigurationException("Template for $type was not found in $file");
+			throw new ConfigurationException(
+				sprintf('Template for "%s" was not found in "%s"', $type, $file)
+			);
 		}
 	}
 
