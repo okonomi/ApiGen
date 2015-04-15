@@ -3,6 +3,7 @@
 namespace ApiGen\Tests\Generator;
 
 use ApiGen\Contracts\Console\Helper\ProgressBarInterface;
+use ApiGen\Contracts\Generator\GeneratorQueueInterface;
 use ApiGen\Contracts\Generator\StepCounterInterface;
 use ApiGen\Contracts\Generator\TemplateGenerators\ConditionalTemplateGeneratorInterface;
 use ApiGen\Contracts\Generator\TemplateGenerators\TemplateGeneratorInterface;
@@ -16,7 +17,7 @@ class GeneratorQueueTest extends PHPUnit_Framework_TestCase
 {
 
 	/**
-	 * @var GeneratorQueue
+	 * @var GeneratorQueueInterface
 	 */
 	private $generatorQueue;
 
