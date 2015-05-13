@@ -1,0 +1,29 @@
+services:
+	# link builders
+	- ApiGen\Routing\LinkBuilder\LinkBuilder
+	- ApiGen\Routing\LinkBuilder\TypeLinkBuilder
+	- ApiGen\Routing\LinkBuilder\ElementLinkBuilder
+	- ApiGen\Routing\ElementLink\ClassElementLink
+	- ApiGen\Routing\ElementLink\ClassConstantElementLink
+	- ApiGen\Routing\ElementLink\ConstantElementLink
+	- ApiGen\Routing\ElementLink\FunctionElementLink
+	- ApiGen\Routing\ElementLink\MethodElementLink
+	- ApiGen\Routing\ElementLink\PropertyElementLink
+
+	# routes
+	- ApiGen\Routing\Router
+	- ApiGen\Routing\Route\AnnotationGroupsRoute
+	- ApiGen\Routing\Route\ClassRoute
+	- ApiGen\Routing\Route\ClassConstantRoute
+	- ApiGen\Routing\Route\CombinedRoute
+	- ApiGen\Routing\Route\ConstantRoute
+	- ApiGen\Routing\Route\ElementListRoute
+	- ApiGen\Routing\Route\FunctionRoute
+	- ApiGen\Routing\Route\MethodRoute
+	- ApiGen\Routing\Route\NamespaceRoute
+	- ApiGen\Routing\Route\OpensearchRoute
+	- ApiGen\Routing\Route\OverviewRoute
+	- ApiGen\Routing\Route\PackageRoute
+	- ApiGen\Routing\Route\PropertyRoute
+	- ApiGen\Routing\Route\SourceCodeRoute
+	- ApiGen\Routing\Route\TreeRoute

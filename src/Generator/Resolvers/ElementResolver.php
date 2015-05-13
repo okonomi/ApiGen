@@ -19,13 +19,6 @@ use ApiGen\Contracts\Parser\Reflection\FunctionReflectionInterface;
 use ApiGen\Contracts\Parser\Reflection\MethodReflectionInterface;
 use ApiGen\Contracts\Parser\Reflection\ParameterReflectionInterface;
 use ApiGen\Contracts\Parser\Reflection\PropertyReflectionInterface;
-use ApiGen\Reflection\ReflectionClass;
-use ApiGen\Reflection\ReflectionConstant;
-use ApiGen\Reflection\ReflectionElement;
-use ApiGen\Reflection\ReflectionFunction;
-use ApiGen\Reflection\ReflectionMethod;
-use ApiGen\Reflection\ReflectionParameter;
-use ApiGen\Reflection\ReflectionProperty;
 use ArrayObject;
 use TokenReflection\Resolver;
 
@@ -34,22 +27,11 @@ class ElementResolver implements ElementResolverInterface
 {
 
 	/**
-	 * @var array
+	 * @var string[]
 	 */
 	private $simpleTypes = [
-		'boolean' => 1,
-		'integer' => 1,
-		'float' => 1,
-		'string' => 1,
-		'array' => 1,
-		'object' => 1,
-		'resource' => 1,
-		'callback' => 1,
-		'callable' => 1,
-		'NULL' => 1,
-		'false' => 1,
-		'true' => 1,
-		'mixed' => 1
+		'boolean', 'integer', 'float', 'string', 'array', 'object', 'resource', 'callback', 'callable', 'NULL', 'false',
+		'true', 'mixed'
 	];
 
 	/**
@@ -210,10 +192,9 @@ class ElementResolver implements ElementResolverInterface
 	 */
 	private function isSimpleType($definition)
 	{
-		if (empty($definition) || isset($this->simpleTypes[$definition])) {
+		if (empty($definition) || in_array($definition, $this->simpleTypes)) {
 			return TRUE;
 		}
-
 		return FALSE;
 	}
 
@@ -308,7 +289,7 @@ class ElementResolver implements ElementResolverInterface
 
 
 	/**
-	 * @param NULL|ReflectionElement $reflectionElement
+	 * @param NULL|ElementReflectionInterface $reflectionElement
 	 * @return bool
 	 */
 	private function isContextUsable($reflectionElement)
@@ -326,7 +307,7 @@ class ElementResolver implements ElementResolverInterface
 	 * @param array|ArrayObject $elements
 	 * @param string $name
 	 * @param string $namespace
-	 * @return ReflectionClass|NULL
+	 * @return ClassReflectionInterface|NULL
 	 */
 	private function findElementByNameAndNamespace($elements, $name, $namespace)
 	{

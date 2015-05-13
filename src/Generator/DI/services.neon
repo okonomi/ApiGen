@@ -1,0 +1,45 @@
+services:
+	# resolvers
+	- ApiGen\Generator\Resolvers\LinkResolver
+	- ApiGen\Generator\Resolvers\ElementResolver
+	- ApiGen\Generator\Resolvers\RelativePathResolver
+
+	# decorators
+	- ApiGen\Generator\Decorator\AnnotationDecorator
+	- ApiGen\Generator\Decorator\AnnotationDecoration\InternalAnnotationDecoration
+	- ApiGen\Generator\Decorator\AnnotationDecoration\LicenseAnnotationDecoration
+	- ApiGen\Generator\Decorator\AnnotationDecoration\LinkAndSeeAnnotationDecoration
+	- ApiGen\Generator\Decorator\AnnotationDecoration\LinkAnnotationDecoration
+	- ApiGen\Generator\Decorator\AnnotationDecoration\SeeAnnotationDecoration
+	- ApiGen\Generator\Decorator\AnnotationDecoration\TypeAnnotationDecoration
+	- ApiGen\Generator\Decorator\AnnotationDecoration\DefaultAnnotationDecoration
+
+	# events
+	- ApiGen\Generator\GeneratorQueue
+
+	# intentionally first to collect output from other generators
+	- ApiGen\Generator\Generators\ZipGenerator
+
+	- ApiGen\Generator\TemplateGenerator\CombinedGenerator
+	- ApiGen\Generator\TemplateGenerator\AnnotationGroupsGenerator
+	- ApiGen\Generator\TemplateGenerator\ElementListGenerator
+	- ApiGen\Generator\TemplateGenerator\OpensearchGenerator
+	- ApiGen\Generator\TemplateGenerator\OverviewGenerator
+	- ApiGen\Generator\TemplateGenerator\SourceCodeGenerator
+	- ApiGen\Generator\TemplateGenerator\TreeGenerator
+
+	# element generators
+	- ApiGen\Generator\TemplateGenerator\ClassGenerator
+	- ApiGen\Generator\TemplateGenerator\ConstantGenerator
+	- ApiGen\Generator\TemplateGenerator\ExceptionGenerator
+	- ApiGen\Generator\TemplateGenerator\FunctionGenerator
+	- ApiGen\Generator\TemplateGenerator\InterfaceGenerator
+	- ApiGen\Generator\TemplateGenerator\NamespaceGenerator
+	- ApiGen\Generator\TemplateGenerator\PackageGenerator
+	- ApiGen\Generator\TemplateGenerator\TraitGenerator
+
+	# element loaders
+	- ApiGen\Generator\Decorator\Template\LayoutDecorator
+	- ApiGen\Generator\Decorator\Template\ElementDecorator
+	- ApiGen\Generator\Decorator\Template\NamespaceDecorator
+	- ApiGen\Generator\Decorator\Template\PackageDecorator

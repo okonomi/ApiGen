@@ -1,0 +1,13 @@
+services:
+	- {class: Latte\Engine, setup: [setTempDirectory('%tempDir%/cache/latte')]}
+	- ApiGen\Latte\Filter\AnnotationFilters
+	- ApiGen\Latte\Filter\DescriptionFilters
+	- ApiGen\Latte\Filter\ElementUrlFilters
+	- ApiGen\Latte\Filter\HighlighterFilters
+	- ApiGen\Latte\Filter\NamespaceUrlFilters
+	- ApiGen\Latte\Filter\PackageUrlFilters
+	- ApiGen\Latte\Filter\RelativePathFilters
+	- ApiGen\Latte\Filter\PhpManualFilters
+	- ApiGen\Latte\Filter\ResolverFilters
+	- ApiGen\Latte\Filter\SourceFilters
+	- ApiGen\Latte\Filter\UrlFilters

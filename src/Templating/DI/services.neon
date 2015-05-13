@@ -1,0 +1,17 @@
+services:
+	- ApiGen\Templating\TemplateFactory
+	- ApiGen\Templating\TemplateFileManager
+
+	# template file providers
+	- ApiGen\Templating\TemplateFile\AnnotationGroupsTemplateFile
+	- ApiGen\Templating\TemplateFile\ClassTemplateFile
+	- ApiGen\Templating\TemplateFile\CombinedTemplateFile
+	- ApiGen\Templating\TemplateFile\ConstantTemplateFile
+	- ApiGen\Templating\TemplateFile\ElementListTemplateFile
+	- ApiGen\Templating\TemplateFile\FunctionTemplateFile
+	- ApiGen\Templating\TemplateFile\NamespaceTemplateFile
+	- ApiGen\Templating\TemplateFile\OpensearchTemplateFile
+	- ApiGen\Templating\TemplateFile\OverviewTemplateFile
+	- ApiGen\Templating\TemplateFile\PackageTemplateFile
+	- ApiGen\Templating\TemplateFile\SourceCodeTemplateFile
+	- ApiGen\Templating\TemplateFile\TreeTemplateFile

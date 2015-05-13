@@ -10,27 +10,20 @@
 namespace ApiGen\Templating;
 
 use ApiGen\Configuration\Configuration;
-use ApiGen\Configuration\ConfigurationOptions as CO;
-use ApiGen\Configuration\Theme\ThemeConfigOptions as TCO;
-use ApiGen\Contracts\Parser\Reflection\ClassReflectionInterface;
-use ApiGen\Contracts\Parser\Reflection\ConstantReflectionInterface;
-use ApiGen\Contracts\Parser\Reflection\FunctionReflectionInterface;
+use ApiGen\Contracts\Generator\Decorator\Template\LayoutDecoratorInterface;
+use ApiGen\Contracts\Routing\RouterInterface;
+use ApiGen\Contracts\Templating\Template\TemplateInterface;
 use ApiGen\Contracts\Templating\TemplateFactory\TemplateFactoryInterface;
-use ApiGen\Templating\Exceptions\UnsupportedElementException;
-use Latte;
-use Nette\Utils\ArrayHash;
+use ApiGen\Contracts\Templating\TemplateFileManagerInterface;
+use ApiGen\Contracts\Theme\Configuration\ThemeConfigurationInterface;
+use Latte\Engine;
 
 
 class TemplateFactory implements TemplateFactoryInterface
 {
 
-	const ELEMENT_SOURCE = 'source';
-	const ELEMENT_PACKAGE = 'package';
-	const ELEMENT_NAMESPACE = 'namespace';
-	const ELEMENT_ANNOTATION_GROUP = 'annotationGroup';
-
 	/**
-	 * @var Latte\Engine
+	 * @var Engine
 	 */
 	private $latteEngine;
 
@@ -40,139 +33,105 @@ class TemplateFactory implements TemplateFactoryInterface
 	private $configuration;
 
 	/**
-	 * @var TemplateNavigator
+	 * @var RouterInterface
 	 */
-	private $templateNavigator;
+	private $router;
 
 	/**
-	 * @var TemplateElementsLoader
-	 */
-	private $templateElementsLoader;
-
-	/**
-	 * @var Template
+	 * @var TemplateInterface
 	 */
 	private $builtTemplate;
 
+	/**
+	 * @var TemplateFileManagerInterface
+	 */
+	private $templateFileManager;
+
+	/**
+	 * @var LayoutDecoratorInterface
+	 */
+	private $layoutDecorator;
+
 
 	public function __construct(
-		Latte\Engine $latteEngine,
+		Engine $latteEngine,
 		Configuration $configuration,
-		TemplateNavigator $templateNavigator,
-		TemplateElementsLoader $templateElementsLoader
+		TemplateFileManagerInterface $templateFileManager,
+		RouterInterface $templateNavigator,
+		LayoutDecoratorInterface $layoutDecorator
 	) {
 		$this->latteEngine = $latteEngine;
 		$this->configuration = $configuration;
-		$this->templateNavigator = $templateNavigator;
-		$this->templateElementsLoader = $templateElementsLoader;
+		$this->templateFileManager = $templateFileManager;
+		$this->router = $templateNavigator;
+		$this->layoutDecorator = $layoutDecorator;
 	}
 
 
 	/**
-	 * @return Template
+	 * {@inheritdoc}
 	 */
-	public function create()
-	{
-		return $this->buildTemplate();
-	}
-
-
-	/**
-	 * @param string $type
-	 * @return Template
-	 */
-	public function createForType($type)
+	public function create($key = NULL, $element = NULL)
 	{
 		$template = $this->buildTemplate();
-		$template->setFile($this->templateNavigator->getTemplatePath($type));
-		$template->setSavePath($this->templateNavigator->getTemplateFileName($type));
+		if ($key) {
+			$template->setFile($this->templateFileManager->getFile($key));
+			$template->setSavePath($this->router->constructUrl($key, $element, TRUE));
+		}
+
+		$this->layoutDecorator->decorate($template);
+
+//		$this->templateElementsLoader->addElementsToTemplate($template);
+
 		$template = $this->setEmptyDefaults($template);
 		return $template;
 	}
 
 
 	/**
-	 * @param string $name
-	 * @param ReflectionElement|string $element
-	 * @throws \Exception
-	 * @return Template
-	 */
-	public function createNamedForElement($name, $element)
-	{
-		$template = $this->buildTemplate();
-		$template->setFile($this->templateNavigator->getTemplatePath($name));
-
-		if ($name === self::ELEMENT_SOURCE) {
-			$template->setSavePath($this->templateNavigator->getTemplatePathForSourceElement($element));
-
-		} elseif ($name === self::ELEMENT_NAMESPACE) {
-			$template->setSavePath($this->templateNavigator->getTemplatePathForNamespace($element));
-
-		} elseif ($name === self::ELEMENT_PACKAGE) {
-			$template->setSavePath($this->templateNavigator->getTemplatePathForPackage($element));
-
-		} elseif ($name === self::ELEMENT_ANNOTATION_GROUP) {
-			$template->setSavePath($this->templateNavigator->getTemplatePathForAnnotationGroup($element));
-
-		} else {
-			throw new UnsupportedElementException($name . ' is not supported template type.');
-		}
-		return $template;
-	}
-
-
-	/**
-	 * @param ReflectionElement $element
-	 * @return Template
-	 */
-	public function createForReflection($element)
-	{
-		$template = $this->buildTemplate();
-
-		if ($element instanceof ClassReflectionInterface) {
-			$template->setFile($this->templateNavigator->getTemplatePath('class'));
-			$template->setSavePath($this->templateNavigator->getTemplatePathForClass($element));
-
-		} elseif ($element instanceof ConstantReflectionInterface) {
-			$template->setFile($this->templateNavigator->getTemplatePath('constant'));
-			$template->setSavePath($this->templateNavigator->getTemplatePathForConstant($element));
-
-		} elseif ($element instanceof FunctionReflectionInterface) {
-			$template->setFile($this->templateNavigator->getTemplatePath('function'));
-			$template->setSavePath($this->templateNavigator->getTemplatePathForFunction($element));
-		}
-
-		return $template;
-	}
-
-
-	/**
-	 * @return Template
+	 * @return TemplateInterface
 	 */
 	private function buildTemplate()
 	{
 		if ($this->builtTemplate === NULL) {
-			$options = $this->configuration->getOptions();
-			$template = new Template($this->latteEngine);
-			$template->setParameters([
-				'config' => ArrayHash::from($options),
-				'basePath' => $options[CO::TEMPLATE][TCO::TEMPLATES_PATH]
+			$template = $this->createTemplate();
+			$template->addParameters([
+				'title' => $this->configuration->getTitle(),
+				'googleCseId' => $this->configuration->getGoogleCseId(),
+				'googleAnalytics' => $this->configuration->getGoogleAnalytics(),
+				'main' => $this->configuration->getMain(),
+				'download' => $this->configuration->isAvailableForDownload(),
+				'tree' => $this->configuration->isTreeAllowed(),
+				'baseUrl' => $this->configuration->getBaseUrl(),
+				'sourceCode' => $this->configuration->shouldGenerateSourceCode(),
+				'elementDetailsCollapsed' => $this->configuration->getThemeConfiguration()->shouldElementDetailsCollapse()
 			]);
+
 			$this->builtTemplate = $template;
 		}
-		return $this->templateElementsLoader->addElementsToTemplate($this->builtTemplate);
+		return $this->layoutDecorator->decorate($this->builtTemplate);
 	}
 
 
 	/**
-	 * @return Template
+	 * @return TemplateInterface
 	 */
-	private function setEmptyDefaults(Template $template)
+	private function setEmptyDefaults(TemplateInterface $template)
 	{
-		return $template->setParameters([
+		$template->addParameters([
 			'namespace' => NULL,
 			'package' => NULL
 		]);
+		return $template;
+	}
+
+
+	/**
+	 * @return TemplateInterface
+	 */
+	private function createTemplate()
+	{
+		return new Template($this->latteEngine);
 	}
 
 }

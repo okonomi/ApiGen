@@ -9,30 +9,39 @@
 
 namespace ApiGen\Generator;
 
-use ApiGen\Contracts\Console\Helper\ProgressBarInterface;
+use ApiGen\Contracts\Console\Helper\ProgressBarFacadeInterface;
 use ApiGen\Contracts\Generator\GeneratorQueueInterface;
 use ApiGen\Contracts\Generator\StepCounterInterface;
-use ApiGen\Contracts\Generator\TemplateGenerators\ConditionalTemplateGeneratorInterface;
-use ApiGen\Contracts\Generator\TemplateGenerators\TemplateGeneratorInterface;
+use ApiGen\Contracts\Generator\TemplateGenerator\ConditionalGeneratorInterface;
+use ApiGen\Contracts\Generator\TemplateGenerator\GeneratorInterface;
 
 
 class GeneratorQueue implements GeneratorQueueInterface
 {
 
 	/**
-	 * @var ProgressBarInterface
+	 * @var GeneratorInterface[]
 	 */
-	private $progressBar;
+	private $generators = [];
 
 	/**
-	 * @var TemplateGeneratorInterface[]
+	 * @var ProgressBarFacadeInterface
 	 */
-	private $queue = [];
+	private $progressBarFacade;
 
 
-	public function __construct(ProgressBarInterface $progressBar)
+	public function __construct(ProgressBarFacadeInterface $progressBarFacade)
 	{
-		$this->progressBar = $progressBar;
+		$this->progressBarFacade = $progressBarFacade;
+	}
+
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function addGenerator(GeneratorInterface $generator)
+	{
+		$this->generators[] = $generator;
 	}
 
 
@@ -41,38 +50,21 @@ class GeneratorQueue implements GeneratorQueueInterface
 	 */
 	public function run()
 	{
-		$this->progressBar->init($this->getStepCount());
-		foreach ($this->getAllowedQueue() as $templateGenerator) {
-			$templateGenerator->generate();
+		$this->progressBarFacade->init($this->getStepCount());
+
+		foreach ($this->getAllowedQueue() as $generator) {
+			$generator->generate();
 		}
 	}
 
 
 	/**
-	 * {@inheritdoc}
-	 */
-	public function addToQueue(TemplateGeneratorInterface $templateGenerator)
-	{
-		$this->queue[] = $templateGenerator;
-	}
-
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function getQueue()
-	{
-		return $this->queue;
-	}
-
-
-	/**
-	 * @return TemplateGenerator[]
+	 * @return GeneratorInterface[]
 	 */
 	private function getAllowedQueue()
 	{
-		return array_filter($this->queue, function (TemplateGeneratorInterface $generator) {
-			if ($generator instanceof ConditionalTemplateGeneratorInterface) {
+		return array_filter($this->generators, function (GeneratorInterface $generator) {
+			if ($generator instanceof ConditionalGeneratorInterface) {
 				return $generator->isAllowed();
 
 			} else {

@@ -9,17 +9,17 @@
 
 namespace ApiGen\Generator\Resolvers;
 
-use ApiGen\Configuration\Configuration;
-use ApiGen\Configuration\ConfigurationOptions as CO;
+use ApiGen\Contracts\Configuration\ConfigurationInterface;
+use ApiGen\Contracts\Generator\Resolvers\RelativePathResolverInterface;
 use ApiGen\Utils\FileSystem;
 use InvalidArgumentException;
 
 
-class RelativePathResolver
+class RelativePathResolver implements RelativePathResolverInterface
 {
 
 	/**
-	 * @var Configuration
+	 * @var ConfigurationInterface
 	 */
 	private $configuration;
 
@@ -29,7 +29,7 @@ class RelativePathResolver
 	private $fileSystem;
 
 
-	public function __construct(Configuration $configuration, FileSystem $fileSystem)
+	public function __construct(ConfigurationInterface $configuration, FileSystem $fileSystem)
 	{
 		$this->configuration = $configuration;
 		$this->fileSystem = $fileSystem;
@@ -37,17 +37,15 @@ class RelativePathResolver
 
 
 	/**
-	 * @param string $fileName
-	 * @return string
+	 * {@inheritdoc}
 	 */
 	public function getRelativePath($fileName)
 	{
-		foreach ($this->configuration->getOption(CO::SOURCE) as $directory) {
+		foreach ($this->configuration->getSource() as $directory) {
 			if (strpos($fileName, $directory) === 0) {
 				return $this->getFileNameWithoutSourcePath($fileName, $directory);
 			}
 		}
-
 		throw new InvalidArgumentException(sprintf('Could not determine "%s" relative path', $fileName));
 	}
 

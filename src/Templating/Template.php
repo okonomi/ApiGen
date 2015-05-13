@@ -9,21 +9,17 @@
 
 namespace ApiGen\Templating;
 
+use ApiGen\Contracts\Templating\Template\TemplateInterface;
 use Latte\Engine;
 
 
-class Template
+class Template implements TemplateInterface
 {
 
 	/**
 	 * @var Engine
 	 */
 	private $latteEngine;
-
-	/**
-	 * @var string
-	 */
-	private $savePath;
 
 	/**
 	 * @var string
@@ -35,6 +31,11 @@ class Template
 	 */
 	private $parameters = [];
 
+	/**
+	 * @var string
+	 */
+	private $savePath;
+
 
 	public function __construct(Engine $latteEngine)
 	{
@@ -43,7 +44,7 @@ class Template
 
 
 	/**
-	 * @param string $file
+	 * {@inheritdoc}
 	 */
 	public function setFile($file)
 	{
@@ -52,7 +53,7 @@ class Template
 
 
 	/**
-	 * @return mixed[]
+	 * {@inheritdoc}
 	 */
 	public function getParameters()
 	{
@@ -61,32 +62,44 @@ class Template
 
 
 	/**
-	 * @return self
+	 * {@inheritdoc}
 	 */
-	public function setParameters(array $parameters)
+	public function addParameters(array $parameters)
 	{
 		$this->parameters = $parameters + $this->parameters;
-		return $this;
 	}
 
 
 	/**
-	 * @param string $savePath
+	 * {@inheritdoc}
 	 */
-	public function setSavePath($savePath)
+	public function getParameter($name)
 	{
-		$this->savePath = $savePath;
+		if (isset($this->parameters[$name])) {
+			return $this->parameters[$name];
+		}
+
+		throw new \Exception(
+			sprintf('Parameter "%s is not set in template.', $name)
+		);
 	}
 
 
 	/**
-	 * @param string $file
+	 * {@inheritdoc}
 	 */
-	public function save($file = NULL)
+	public function setSavePath($path)
 	{
-		$this->savePath = $file ?: $this->savePath;
+		$this->savePath = $path;
+	}
+
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function save()
+	{
 		$dir = dirname($this->savePath);
-
 		if ( ! is_dir($dir)) {
 			mkdir($dir, 0755, TRUE);
 		}
