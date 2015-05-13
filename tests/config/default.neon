@@ -1,6 +1,10 @@
 extensions:
 	- ApiGen\DI\ApiGenExtension
+	- ApiGen\Configuration\DI\ConfigurationExtension
 	- ApiGen\Console\DI\ConsoleExtension
 	- ApiGen\EventDispatcher\DI\EventDispatcherExtension
 	- ApiGen\Parser\DI\ParserExtension
+	- ApiGen\Routing\DI\RoutingExtension
+	- ApiGen\Templating\DI\TemplatingExtension
+	- ApiGen\Theme\DI\ThemeExtension
 	- ApiGen\Utils\DI\UtilsExtension

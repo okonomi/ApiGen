@@ -26,8 +26,8 @@ class TemplateElementsLoaderTest extends PHPUnit_Framework_TestCase
 	{
 		$elementStorageMock = $this->getElementStorageMock();
 		$configurationMock = Mockery::mock(Configuration::class);
-		$configurationMock->shouldReceive('getOption')->with(CO::DOWNLOAD)->andReturn(TRUE);
-		$configurationMock->shouldReceive('getOption')->with(CO::ANNOTATION_GROUPS)->andReturn(['todo']);
+		$configurationMock->shouldReceive('getAnnotationGroups')->andReturn(['todo']);
+		$configurationMock->shouldReceive('isAvailableForDownload')->andReturn(TRUE);
 		$configurationMock->shouldReceive('getZipFileName')->andReturn('file.zip');
 
 		$autocompleteElementsMock = Mockery::mock(AutocompleteElements::class);

@@ -1,8 +1,9 @@
 <?php
 
-namespace ApiGen\Tests\Generator\Resolvers;
+namespace ApiGen\Generator\Tests\Resolver;
 
 use ApiGen\Configuration\Configuration;
+use ApiGen\Contracts\Generator\Configuration\GeneratorConfigurationInterface;
 use ApiGen\Generator\Resolvers\RelativePathResolver;
 use ApiGen\Utils\FileSystem;
 use InvalidArgumentException;
@@ -15,9 +16,10 @@ class RelativePathResolverTest extends PHPUnit_Framework_TestCase
 
 	public function testGetRelativePath()
 	{
-		$configuration = Mockery::mock(Configuration::class);
-		$configuration->shouldReceive('getOption')->with('source')->andReturn([TEMP_DIR]);
-		$relativePathResolver = new RelativePathResolver($configuration, new FileSystem);
+		$configurationMock = Mockery::mock(GeneratorConfigurationInterface::class, [
+			'getSource' => [TEMP_DIR]
+		]);
+		$relativePathResolver = new RelativePathResolver($configurationMock, new FileSystem);
 
 		$this->assertSame('some-file.txt', $relativePathResolver->getRelativePath(TEMP_DIR . '/some-file.txt'));
 		$this->assertSame(
@@ -29,8 +31,9 @@ class RelativePathResolverTest extends PHPUnit_Framework_TestCase
 
 	public function testGetRelativePathWithWindowsPath()
 	{
-		$configuration = Mockery::mock(Configuration::class);
-		$configuration->shouldReceive('getOption')->with('source')->andReturn(['C:\some\dir']);
+		$configuration = Mockery::mock(Configuration::class, [
+			'getSource' => ['C:\some\dir']
+		]);
 		$relativePathResolver = new RelativePathResolver($configuration, new FileSystem);
 
 		$this->assertSame('file.txt', $relativePathResolver->getRelativePath('C:\some\dir\file.txt'));
@@ -40,8 +43,9 @@ class RelativePathResolverTest extends PHPUnit_Framework_TestCase
 
 	public function testGetRelativePathInvalid()
 	{
-		$configuration = Mockery::mock(Configuration::class);
-		$configuration->shouldReceive('getOption')->with('source')->andReturn([TEMP_DIR]);
+		$configuration = Mockery::mock(Configuration::class, [
+			'getSource' => [TEMP_DIR]
+		]);
 		$relativePathResolver = new RelativePathResolver($configuration, new FileSystem);
 
 		$this->setExpectedException(InvalidArgumentException::class);
@@ -55,8 +59,8 @@ class RelativePathResolverTest extends PHPUnit_Framework_TestCase
 	public function testGetRelativePathWithSourceEndingSlash()
 	{
 		$configuration = Mockery::mock(Configuration::class);
-		$configuration->shouldReceive('getOption')->with('source')->once()->andReturn(['ProjectBeta']);
-		$configuration->shouldReceive('getOption')->with('source')->twice()->andReturn(['ProjectBeta/']);
+		$configuration->shouldReceive('getSource')->once()->andReturn(['ProjectBeta']);
+		$configuration->shouldReceive('getSource')->twice()->andReturn(['ProjectBeta/']);
 		$relativePathResolver = new RelativePathResolver($configuration, new FileSystem);
 
 		$fileName = 'ProjectBeta/entities/Category.php';
