@@ -6,7 +6,7 @@
  */
 function includeIfExists($file)
 {
-	return file_exists($file) ? include $file : FALSE;
+	return file_exists($file) ? include_once $file : FALSE;
 }
 
 

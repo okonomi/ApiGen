@@ -1,10 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-use ApiGen\Console\Application;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
 require __DIR__ . '/bootstrap.php';
 
 
@@ -37,10 +33,8 @@ $container = $configurator->createContainer();
 
 
 /** @var ApiGen\Console\Application $application */
-$application = $container->getByType(Application::class);
-$input = $container->getByType(InputInterface::class);
-$output = $container->getByType(OutputInterface::class);
-$application->run($input, $output);
+$application = $container->getByType(ApiGen\Console\Application::class);
+$application->run();
 
 
 // Remove temp data

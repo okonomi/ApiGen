@@ -21,19 +21,21 @@
 
 		"kukulich/fshl": "~2.1",
 		"michelf/php-markdown": "~1.4",
-		"symfony/options-resolver": "~2.6.1",
-		"symfony/console": "~2.6",
-		"symfony/yaml": "~2.6",
-		"herrera-io/phar-update": "~2.0",
 
-		"apigen/theme-default": "1.0.*",
-		"apigen/theme-bootstrap": "1.1.*",
+		"apigen/configuration": "0.1.*",
+		"apigen/console": "0.1.*",
 		"apigen/event-dispatcher": "0.1.*",
 		"apigen/parser": "0.1.*",
-		"apigen/utils": "0.1.*"
+		"apigen/theme": "0.1.*",
+		"apigen/theme-default": "~2.0",
+		"apigen/theme-bootstrap": "~1.1",
+		"apigen/utils": "0.1.*",
+		"nikic/php-parser": "~1.2",
+		"league/commonmark": "0.7.*",
+		"gherkins/regexpbuilderphp": "0.7.*"
 	},
 	"require-dev": {
-		"mockery/mockery": "~0.9",
+		"mockery/mockery": "0.9.*",
 		"herrera-io/box": "~1.6"
 	},
 	"autoload": {
@@ -43,7 +45,10 @@
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"ApiGen\\Tests\\": "tests"
+			"ApiGen\\Tests\\": "tests",
+			"ApiGen\\Latte\\Tests\\": "tests/Latte",
+			"ApiGen\\Templating\\Tests\\": "tests/Templating",
+			"ApiGen\\Routing\\Tests\\": "tests/Routing"
 		}
 	},
 	"bin": [
